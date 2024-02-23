@@ -243,7 +243,7 @@ app.get("/profile", (req, res) => {
     res.json(null);
   }
 });
-
+const port = process.env.PORT || 3001;
 app.listen(process.env.PORT, () => {
   const port = process.env.PORT;
   console.log("server started in port " + port);
