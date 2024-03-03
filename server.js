@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require('path');
 const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -7,9 +8,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-
 app.use(cookieParser());
 app.use(cors());
+
+// app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -57,6 +59,10 @@ const cartSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const Event = mongoose.model("Event", eventSchema);
 const Cart = mongoose.model("Cart", cartSchema);
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+//  });
 
 // signup route
 app.post("/signup", async (req, res) => {
@@ -243,8 +249,8 @@ app.get("/profile", (req, res) => {
     res.json(null);
   }
 });
-const port = process.env.PORT || 3001;
+
 app.listen(process.env.PORT, () => {
-  const port = process.env.PORT;
+  const port = process.env.PORT || 3001;
   console.log("server started in port " + port);
 });
