@@ -11,7 +11,8 @@ const cors = require("cors");
 app.use(cookieParser());
 app.use(cors());
 
-// app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+app.use(express.static(path.join(__dirname, '..', 'client', 'build','index.html')));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -60,9 +61,8 @@ const User = mongoose.model("User", userSchema);
 const Event = mongoose.model("Event", eventSchema);
 const Cart = mongoose.model("Cart", cartSchema);
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
-//  });
+
+
 
 // signup route
 app.post("/signup", async (req, res) => {
@@ -249,6 +249,11 @@ app.get("/profile", (req, res) => {
     res.json(null);
   }
 });
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+ });
+
 
 app.listen(process.env.PORT, () => {
   const port = process.env.PORT || 3001;
