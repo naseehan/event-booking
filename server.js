@@ -1,4 +1,6 @@
 const express = require("express");
+const bodyParser = require('body-parser');
+
 const path = require('path');
 const app = express();
 const mongoose = require("mongoose");
@@ -8,8 +10,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const stripe = require('stripe')(process.env.STRIPE_SECRET)
+
 app.use(cookieParser());
 app.use(cors());
+app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
@@ -243,6 +248,41 @@ app.delete("/deleteCart/:cartId", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
+})
+
+// route for stripe
+app.post("/purchase",async(req, res)=> {
+  try{
+  const {products} = req.body;
+
+  const lineItems = products.map((product)=>({
+    price_data:{
+      currency:"inr",
+      product_data:{
+        name:product.name,
+        images:[product.image]
+        // venue:product.venue,
+        // price:product.price,
+        // place:product.place,
+      },
+      unit_amount:Math.round(product.price * 100),
+    },
+    quantity:1
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types:["card"],
+    line_items:lineItems,
+    mode:"payment",
+    success_url:"http://localhost:3000/success",
+    cancel_url:"http://localhost:3000/cancel"
+  })
+console.log(session);
+  res.json({ id:session.id, })
+}catch(error){
+  res.status(500).json({ message: "Internal server error" })
+ 
+}
 })
 
 app.get("/profile", (req, res) => {
