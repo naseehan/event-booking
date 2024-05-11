@@ -250,6 +250,17 @@ app.delete("/deleteCart/:cartId", async (req, res) => {
   }
 })
 
+// route for getting search results
+app.get("/searchedEvents", async(req, res) => {
+  try {
+    const category = req.query.category;
+    const foundCategory = await Event.find({category})
+    res.json(foundCategory)
+  } catch (error) {
+    res.status(500).json({ error: "Couldnt find events" });
+  }
+})
+
 // route for stripe
 app.post("/purchase",async(req, res)=> {
   try{
