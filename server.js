@@ -11,6 +11,8 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const stripe = require('stripe')(process.env.STRIPE_SECRET)
+// rate limit
+const rateLimit = require('express-rate-limit')
 
 app.use(cookieParser());
 app.use(cors());
@@ -21,6 +23,14 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+const limiter = rateLimit({
+  max: 1000,
+  windowMs: 60 * 60 * 1000,
+  message: "we have recieved too many requests from this IP. Please try again later"
+})
+
+app.use("/getEachEvent", limiter )
 
 // connect to mongodb
 mongoose.connect(process.env.MONGO_URL, {
@@ -187,9 +197,14 @@ app.get("/getEachEvent", async (req, res) => {
 // for getting all events
 app.get("/getEvent", async (req, res) => {
   try {
-    // const userId = req.headers["userid"];
-    const getEvent = await Event.find();
-    res.json(getEvent);
+   let {limit, skip} = req.query
+    
+    // get event count and events for pagination
+    const [getEvents, allEvents] = await Promise.all([
+      Event.find().limit(limit).skip(skip),
+      Event.countDocuments()
+    ])
+    res.json({getEvents, allEvents});
   } catch (error) {
     res.status(500).json({ error: "Could'nt get events" });
   }
