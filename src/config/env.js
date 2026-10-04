@@ -9,7 +9,7 @@ const config = {
   jwtSecret: process.env.JWT_SECRET || 'fallback_secret_change_me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   stripeSecret: process.env.STRIPE_SECRET || '',
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+  clientUrl: process.env.CLIENT_URL || 'https://noble-events.onrender.com',
   isProduction: process.env.NODE_ENV === 'production',
 };
 
